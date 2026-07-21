@@ -1,0 +1,82 @@
+{
+  "info": {
+    "name": "Gym Progress Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Progress entries and trainer reviews. Gateway identity is supplied through user-* headers.",
+    "version": { "major": 1, "minor": 1, "patch": 0 }
+  },
+  "item": [
+    { "name": "Health Check", "request": { "method": "GET", "url": "{{baseUrl}}/health" } },
+    {
+      "name": "Create Progress Entry (Customer)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "user-id", "value": "{{customerId}}" },
+          { "key": "user-role", "value": "customer" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"id\": \"{{entryId}}\",\n  \"customer_id\": \"{{customerId}}\",\n  \"entry_date\": \"2026-07-16T08:00:00.000Z\",\n  \"weight_kg\": 82.4,\n  \"body_fat_pct\": 18.2,\n  \"inbody_data\": { \"muscle_mass_kg\": 54.3 },\n  \"nutrition_log\": { \"calories\": 2350, \"protein_g\": 180 }\n}" },
+        "url": "{{baseUrl}}/api/progress"
+      }
+    },
+    {
+      "name": "Get Progress Entry (Customer)",
+      "request": { "method": "GET", "header": [{ "key": "user-id", "value": "{{customerId}}" }], "url": "{{baseUrl}}/api/progress/{{entryId}}" }
+    },
+    {
+      "name": "List Customer Entries",
+      "request": { "method": "GET", "header": [{ "key": "user-id", "value": "{{customerId}}" }], "url": "{{baseUrl}}/api/progress?customer_id={{customerId}}&from=2026-07-01&to=2026-07-31&page=1&limit=25" }
+    },
+    {
+      "name": "Get Latest Customer Entry",
+      "request": { "method": "GET", "header": [{ "key": "user-id", "value": "{{customerId}}" }], "url": "{{baseUrl}}/api/progress/customers/{{customerId}}/latest" }
+    },
+    {
+      "name": "Get Customer Summary",
+      "request": { "method": "GET", "header": [{ "key": "user-id", "value": "{{customerId}}" }], "url": "{{baseUrl}}/api/progress/customers/{{customerId}}/summary?from=2026-07-01&to=2026-07-31" }
+    },
+    {
+      "name": "Update Progress Entry (Customer)",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "user-id", "value": "{{customerId}}" }],
+        "body": { "mode": "raw", "raw": "{ \"weight_kg\": 81.9 }" },
+        "url": "{{baseUrl}}/api/progress/{{entryId}}"
+      }
+    },
+    {
+      "name": "Add Trainer Review",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "user-id", "value": "{{trainerId}}" }, { "key": "user-role", "value": "trainer" }],
+        "body": { "mode": "raw", "raw": "{ \"notes\": \"Excellent consistency this week.\", \"metrics\": { \"weekly_goal_met\": true } }" },
+        "url": "{{baseUrl}}/api/progress/{{entryId}}/reviews"
+      }
+    },
+    {
+      "name": "Update Trainer Review",
+      "request": {
+        "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "user-id", "value": "{{trainerId}}" }, { "key": "user-role", "value": "trainer" }],
+        "body": { "mode": "raw", "raw": "{ \"notes\": \"Excellent consistency; increase protein slightly.\" }" },
+        "url": "{{baseUrl}}/api/progress/{{entryId}}/reviews/{{reviewId}}"
+      }
+    },
+    {
+      "name": "Delete Trainer Review",
+      "request": { "method": "DELETE", "header": [{ "key": "user-id", "value": "{{trainerId}}" }, { "key": "user-role", "value": "trainer" }], "url": "{{baseUrl}}/api/progress/{{entryId}}/reviews/{{reviewId}}" }
+    },
+    {
+      "name": "Delete Progress Entry (Customer)",
+      "request": { "method": "DELETE", "header": [{ "key": "user-id", "value": "{{customerId}}" }], "url": "{{baseUrl}}/api/progress/{{entryId}}" }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001" },
+    { "key": "customerId", "value": "customer-abc" },
+    { "key": "trainerId", "value": "trainer-abc" },
+    { "key": "entryId", "value": "entry-123" },
+    { "key": "reviewId", "value": "replace-with-review-_id" }
+  ]
+}
