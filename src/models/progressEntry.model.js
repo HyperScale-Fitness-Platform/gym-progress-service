@@ -15,7 +15,7 @@ const ProgressEntrySchema = new Schema(
     entry_date: { type: Date, required: true, immutable: true },
     weight_kg: { type: Number, min: 0, max: 500 },
     body_fat_pct: { type: Number, min: 0, max: 100 },
-    inbody_data: { type: Schema.Types.Mixed },
+    // inbody_data: { type: Schema.Types.Mixed },
     nutrition_log: { type: Schema.Types.Mixed },
     trainer_reviews: { type: [ReviewSchema], default: [] },
   },
