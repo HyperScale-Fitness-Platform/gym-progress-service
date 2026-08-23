@@ -11,6 +11,10 @@ const {
 } = require("../middleware/role.middleware");
 
 const {
+  resolvePlanTargetCustomer,
+} = require("../middleware/planTargetCustomer.middleware");
+
+const {
   authorizeExercisePlanCustomerAccess,
   loadExercisePlan,
   authorizeExercisePlanEntryAccess,
@@ -20,10 +24,13 @@ const router = Router();
 
 /*
  * Customer creates their own exercise plan.
+ * Trainer creates a plan for one of their PT-package customers
+ * (customer_id in body). Admin can create for anyone.
  */
 router.post(
   "/",
-  authorize(["customer", "admin"]),
+  authorize(["customer", "trainer", "admin"]),
+  resolvePlanTargetCustomer,
   validateExercisePlan(),
   controller.create,
 );

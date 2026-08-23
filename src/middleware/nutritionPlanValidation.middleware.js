@@ -206,7 +206,10 @@ function validateNutritionPlan({
     }
 
     if (!partial) {
-      if (!isNonEmptyString(body.id, 100)) {
+      if (
+        body.id !== undefined &&
+        !isNonEmptyString(body.id, 100)
+      ) {
         errors.id =
           "must be a non-empty string up to 100 characters";
       }
@@ -274,6 +277,7 @@ function validateNutritionPlan({
       }
 
       if (
+        body.generated_by !== undefined &&
         !["trainer", "ai"].includes(
           body.generated_by,
         )

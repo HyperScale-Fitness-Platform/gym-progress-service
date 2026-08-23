@@ -1,15 +1,16 @@
 const ExercisePlan = require("../models/exercisePlan.model");
-const TrainerAssignment = require("../models/trainerAssignment.model");
+const {
+  trainerHasCustomer,
+} = require("../services/assignment.service");
 
 async function hasActiveTrainerAssignment(
   trainerId,
   customerId,
 ) {
-  return TrainerAssignment.exists({
-    trainer_id: trainerId,
-    customer_id: customerId,
-    active: true,
-  });
+  return trainerHasCustomer(
+    String(trainerId),
+    String(customerId),
+  );
 }
 
 async function authorizeExercisePlanCustomerAccess(

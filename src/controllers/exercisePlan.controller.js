@@ -1,19 +1,34 @@
 const service = require("../services/exercisePlan.service");
+const {
+  publishExercisePlanUpsert,
+  publishExercisePlanDelete,
+} = require("../events/planEvent.publisher");
 
 async function create(req, res, next) {
     try {
         const data = {
             ...req.body,
             id: `exercise-plan-${Date.now()}`,
-            customer_id: req.user.id,
+            customer_id:
+                res.locals.planTargetCustomerId ||
+                req.user.id,
             source:
-                req.user.role === "customer"
-                    ? "customer"
-                    : "trainer",
+                res.locals.requestedAiSource
+                    ? "ai"
+                    : req.user.role === "customer"
+                        ? "customer"
+                        : "trainer",
         };
+
+        if (res.locals.createdByTrainerId) {
+            data.created_by_trainer_id =
+                res.locals.createdByTrainerId;
+        }
 
         const created =
             await service.createExercisePlan(data);
+
+        publishExercisePlanUpsert(created);
 
         return res.status(201).json(created);
     } catch (error) {
@@ -94,6 +109,8 @@ async function update(req, res, next) {
             });
         }
 
+        publishExercisePlanUpsert(updated);
+
         return res.json(updated);
     } catch (error) {
         next(error);
@@ -112,6 +129,8 @@ async function remove(req, res, next) {
                 message: "Exercise plan not found",
             });
         }
+
+        publishExercisePlanDelete(deleted);
 
         return res.status(204).send();
     } catch (error) {

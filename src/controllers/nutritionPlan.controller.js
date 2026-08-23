@@ -1,14 +1,31 @@
 const service = require("../services/nutritionPlan.service");
+const {
+  publishNutritionPlanUpsert,
+  publishNutritionPlanDelete,
+} = require("../events/planEvent.publisher");
 
 async function create(req, res, next) {
   try {
     const data = {
       ...req.body,
-      customer_id: req.user.id,
+      id:
+        req.body.id ||
+        `nutrition-plan-${Date.now()}`,
+      customer_id:
+        res.locals.planTargetCustomerId ||
+        req.user.id,
+      generated_by: req.body.generated_by || "trainer",
     };
+
+    if (res.locals.createdByTrainerId) {
+      data.created_by_trainer_id =
+        res.locals.createdByTrainerId;
+    }
 
     const created =
       await service.createNutritionPlan(data);
+
+    publishNutritionPlanUpsert(created);
 
     return res.status(201).json(created);
   } catch (error) {
@@ -95,6 +112,8 @@ async function update(req, res, next) {
       });
     }
 
+    publishNutritionPlanUpsert(updated);
+
     return res.json(updated);
   } catch (error) {
     next(error);
@@ -114,6 +133,8 @@ async function remove(req, res, next) {
         message: "Nutrition plan not found",
       });
     }
+
+    publishNutritionPlanDelete(deleted);
 
     return res.status(204).send();
   } catch (error) {

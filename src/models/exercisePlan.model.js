@@ -66,6 +66,12 @@ const ExercisePlanSchema = new Schema(
       maxlength: 100,
     },
 
+    created_by_trainer_id: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+    },
+
     plan_name: {
       type: String,
       required: true,

@@ -33,7 +33,7 @@ async function getCustomerNutritionPlans(
     (Number(page) - 1) * Number(limit);
 
   return NutritionPlan.find(query)
-    .sort({ start_date: -1 })
+    .sort({ start_date: -1, createdAt: -1 })
     .skip(skip)
     .limit(Number(limit))
     .lean();
@@ -43,8 +43,12 @@ async function getLatestNutritionPlan(customerId) {
   return NutritionPlan.findOne({
     customer_id: customerId,
   })
-    .sort({ start_date: -1 })
+    .sort({ start_date: -1, createdAt: -1 })
     .lean();
+}
+
+async function getAllNutritionPlans() {
+  return NutritionPlan.find({}).lean();
 }
 
 async function updateNutritionPlan(
@@ -78,6 +82,7 @@ async function deleteNutritionPlan(
 }
 
 module.exports = {
+  getAllNutritionPlans,
   createNutritionPlan,
   getNutritionPlanById,
   getCustomerNutritionPlans,

@@ -16,6 +16,7 @@ services:
     environment:
       - PORT=3001
       - MONGO_URI=mongodb://mongo:27017/gym-progress
+      - OPERATIONS_SERVICE_URL=http://localhost:4001
     depends_on:
       - mongo
     volumes:

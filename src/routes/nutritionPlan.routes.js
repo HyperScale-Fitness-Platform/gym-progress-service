@@ -11,6 +11,10 @@ const {
 } = require("../middleware/role.middleware");
 
 const {
+  resolvePlanTargetCustomer,
+} = require("../middleware/planTargetCustomer.middleware");
+
+const {
   authorizeNutritionPlanCustomerAccess,
   loadNutritionPlan,
   authorizeNutritionPlanEntryAccess,
@@ -20,12 +24,15 @@ const router = Router();
 
 /*
  * Customer creates a nutrition plan.
+ * Trainer creates a plan for one of their PT-package customers
+ * (customer_id in body). Admin can create for anyone.
  * AI-generated plans will also eventually be
  * created internally by the AI integration.
  */
 router.post(
   "/",
-  authorize(["customer", "admin"]),
+  authorize(["customer", "trainer", "admin"]),
+  resolvePlanTargetCustomer,
   validateNutritionPlan(),
   controller.create,
 );
