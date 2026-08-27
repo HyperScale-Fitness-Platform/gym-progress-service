@@ -72,11 +72,17 @@ pipeline {
         stage('Lint & Test') {
             steps {
                 echo '🧪 Running eslint + jest inside a node:20 container...'
-                // Run in a throwaway node container that shares the Jenkins
+                // Runs in a throwaway node container that shares the Jenkins
                 // container's volumes, so the workspace is visible without
-                // needing node on the agent. (Jenkins container is "jenkins".)
+                // needing node on the agent. Debian (glibc), not alpine:
+                // the integration suite's mongodb-memory-server needs the
+                // ubuntu-22.04 mongod build. MONGOMS_DOWNLOAD_DIR points at a
+                // path in the jenkins volume so the ~100MB mongod binary is
+                // cached across builds (survives cleanWs).
                 sh '''
-                    docker run --rm --volumes-from jenkins -w "${WORKSPACE}" node:20-alpine \
+                    docker run --rm --volumes-from jenkins -w "${WORKSPACE}" \
+                      -e MONGOMS_DOWNLOAD_DIR=/var/jenkins_home/.cache/mongodb-binaries \
+                      node:20 \
                       sh -c "npm ci --no-audit --no-fund && npm run lint --if-present && npm test"
                 '''
             }
